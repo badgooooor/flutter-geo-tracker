@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
+import 'package:geo_tracking/mqttClientWrapper.dart';
 
 void main() => runApp(MyApp());
 
@@ -16,9 +17,16 @@ class _MyAppState extends State<MyApp> {
   String bearing = "waiting...";
   String speed = "waiting...";
 
+  MQTTClientWrapper mqttClientWrapper;
+  void MQTTsetup() {
+    mqttClientWrapper = MQTTClientWrapper();
+    mqttClientWrapper.prepareMqttClient();
+  }
+
   @override
   void initState() {
     super.initState();
+    MQTTsetup();
 
     BackgroundLocation.startLocationService();
     BackgroundLocation.getLocationUpdates((location) {
@@ -39,6 +47,8 @@ class _MyAppState extends State<MyApp> {
       Bearing:  $bearing
       Speed: $speed
       """);
+
+      mqttClientWrapper.publishLocation(location.latitude, location.longitude);
     });
   }
 
